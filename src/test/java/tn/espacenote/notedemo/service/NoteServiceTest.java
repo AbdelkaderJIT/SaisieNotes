@@ -20,6 +20,7 @@ import tn.espacenote.notedemo.repository.MatiereRepository;
 import tn.espacenote.notedemo.repository.NoteRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -202,6 +203,32 @@ class NoteServiceTest {
     void notesDe_enseignantNonAffecte_estRefuse() {
         assertThrows(AccesMatiereRefuseException.class, () -> service.notesDe(SONIA_ID, MATIERE_ID));
         verify(noteRepository, never()).findByMatiere(any());
+    }
+
+    @Test
+    void matiereDe_enseignantNonAffecte_estRefuse() {
+        assertThrows(AccesMatiereRefuseException.class, () -> service.matiereDe(SONIA_ID, MATIERE_ID));
+    }
+
+    @Test
+    void matiereDe_enseignantAffecte_renvoieLaMatiere() {
+        assertEquals("Algorithmique", service.matiereDe(ALI_ID, MATIERE_ID).libelle());
+    }
+
+    @Test
+    void etudiantsDe_renvoieLesInscrits() {
+        when(etudiantRepository.findByMatieresContainingOrderByNomAscPrenomAsc(algo)).thenReturn(List.of(amine));
+
+        var etudiants = service.etudiantsDe(ALI_ID, MATIERE_ID);
+
+        assertEquals(1, etudiants.size());
+        assertEquals("Gharbi", etudiants.get(0).nom());
+    }
+
+    @Test
+    void etudiantsDe_enseignantNonAffecte_estRefuse() {
+        assertThrows(AccesMatiereRefuseException.class, () -> service.etudiantsDe(SONIA_ID, MATIERE_ID));
+        verify(etudiantRepository, never()).findByMatieresContainingOrderByNomAscPrenomAsc(any());
     }
 
     @Test

@@ -8,6 +8,8 @@ API REST (Spring Boot) permettant à un enseignant de **saisir**, **modifier** e
 |---|---|
 | Mon profil (sert à valider le login côté Angular) | `GET /api/me` |
 | Lister mes matières | `GET /api/matieres` |
+| Détail d'une matière | `GET /api/matieres/{id}` |
+| Étudiants inscrits à une matière (liste déroulante de saisie) | `GET /api/matieres/{id}/etudiants` |
 | Consulter les notes d'une matière | `GET /api/matieres/{id}/notes` |
 | Saisir une note | `POST /api/matieres/{id}/notes` |
 | Modifier une note | `PUT /api/notes/{id}` |
@@ -86,9 +88,11 @@ Choix de conception :
 
 ## Tests
 ```
-.\mvnw.cmd test "-Dtest=NoteServiceTest"
+.\mvnw.cmd test "-Dtest=NoteServiceTest"      # backend
+cd frontend; npx ng test --watch=false         # frontend (Vitest)
 ```
-19 tests unitaires sur `NoteService` (Mockito, sans base de données) : bornes 0 et 20, valeur négative ou absente, enseignant non affecté, matière clôturée, étudiant non inscrit, doublon, modification, clôture. `NoteDemoApplicationTests` démarre tout le contexte et nécessite MySQL.
+- **Backend** : 24 tests unitaires sur `NoteService` (Mockito, sans base de données) : bornes 0 et 20, valeur négative ou absente, enseignant non affecté, matière clôturée, étudiant non inscrit, doublon, modification, clôture. `NoteDemoApplicationTests` démarre tout le contexte et nécessite MySQL.
+- **Frontend** : 42 tests (authentification et gardes, liste des matières, page des notes, formulaire de saisie et de modification, clôture).
 
 ## Diagrammes (PlantUML, dossier `docs/`)
 `class-diagram.puml`, `use-case-diagram.puml`, `sequence-saisir-note.puml`.
@@ -104,6 +108,8 @@ npm install                          # une seule fois
 npx ng serve                         # front, http://localhost:4200
 ```
 `frontend/proxy.conf.json` redirige `/api/*` vers `http://localhost:8080` : le navigateur ne parle qu'au port 4200, donc aucune configuration CORS n'est nécessaire en développement.
+
+Écrans : connexion, liste des matières, et page d'une matière (tableau des notes, moyenne, **ajout** et **modification** d'une note par formulaire, **clôture** avec confirmation). La liste de saisie ne propose que les étudiants inscrits qui n'ont pas encore de note ; les boutons d'action disparaissent quand la matière est clôturée. Le formulaire valide le format côté navigateur (0 à 20, 2 décimales), puis affiche les erreurs renvoyées par l'API (champ invalide, matière clôturée, doublon...).
 
 L'écran de connexion (`login/`) valide les identifiants via `GET /api/me`. Ils sont gardés **en mémoire** par `AuthService` (jamais dans `localStorage`) et ajoutés à chaque appel `/api` par un intercepteur ; un rechargement de la page déconnecte, et un 401 renvoie vers `/login`. Le backend répond 401 **sans** en-tête `WWW-Authenticate`, sinon le navigateur ouvre sa propre fenêtre de connexion.
 

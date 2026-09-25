@@ -1,0 +1,35 @@
+<form class="formulaire" [formGroup]="form" (ngSubmit)="soumettre()" novalidate>
+  <h2>{{ modification() ? 'Modifier la note' : 'Ajouter une note' }}</h2>
+
+  @if (note(); as n) {
+    <p class="etudiant-fixe">{{ n.etudiantPrenom }} {{ n.etudiantNom }} ({{ n.etudiantNumInscription }})</p>
+  } @else {
+    <label for="etudiant">Étudiant</label>
+    <select id="etudiant" formControlName="etudiantId">
+      <option [ngValue]="null" disabled>Choisir un étudiant…</option>
+      @for (etudiant of etudiants(); track etudiant.id) {
+        <option [ngValue]="etudiant.id">{{ etudiant.nom }} {{ etudiant.prenom }} ({{ etudiant.numInscription }})</option>
+      }
+    </select>
+    @if (messageEtudiant(); as message) {
+      <p class="champ-erreur">{{ message }}</p>
+    }
+  }
+
+  <label for="valeur">Note (sur 20)</label>
+  <input id="valeur" type="number" step="0.01" inputmode="decimal" formControlName="valeur" />
+  @if (messageValeur(); as message) {
+    <p class="champ-erreur">{{ message }}</p>
+  }
+
+  @if (erreur(); as message) {
+    <p class="erreur" role="alert">{{ message }}</p>
+  }
+
+  <div class="actions">
+    <button type="submit" [disabled]="enCours()">
+      {{ enCours() ? 'Enregistrement…' : 'Enregistrer' }}
+    </button>
+    <button type="button" class="secondaire" (click)="annule.emit()">Annuler</button>
+  </div>
+</form>

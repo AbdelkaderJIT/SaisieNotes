@@ -1,0 +1,118 @@
+<main class="page">
+  <a class="retour" routerLink="/matieres">← Mes matières</a>
+
+  @if (chargement()) {
+    <p class="etat">Chargement…</p>
+  } @else if (erreur(); as message) {
+    <p class="erreur" role="alert">{{ message }}</p>
+  } @else if (matiere(); as m) {
+    <div class="entete">
+      <h1>{{ m.libelle }}</h1>
+      @if (m.cloturee) {
+        <span class="badge">Clôturée</span>
+      }
+    </div>
+    <p class="aide">{{ m.code }} · Semestre {{ m.semestre }}</p>
+
+    @if (!m.cloturee) {
+      <div class="barre-actions">
+        <button type="button" (click)="ajouter()" [disabled]="etudiantsSansNote().length === 0">
+          Ajouter une note
+        </button>
+        <button type="button" class="secondaire" (click)="demanderCloture()">Clôturer la matière</button>
+        @if (etudiantsSansNote().length === 0) {
+          <span class="aide">Tous les étudiants inscrits ont déjà une note.</span>
+        }
+      </div>
+    } @else {
+      <p class="aide">Matière clôturée : aucune saisie ni modification possible.</p>
+    }
+
+    @if (succes(); as message) {
+      <p class="succes" role="status">{{ message }}</p>
+    }
+    @if (erreurAction(); as message) {
+      <p class="erreur" role="alert">{{ message }}</p>
+    }
+
+    @if (clotureDemandee()) {
+      <div class="confirmation" role="alertdialog" aria-label="Confirmer la clôture">
+        <p>
+          <strong>Clôturer « {{ m.libelle }} » ?</strong> Cette action est définitive : plus aucune note ne pourra
+          être ajoutée ni modifiée.
+        </p>
+        <div class="actions">
+          <button type="button" (click)="confirmerCloture()">Confirmer la clôture</button>
+          <button type="button" class="secondaire" (click)="annulerCloture()">Annuler</button>
+        </div>
+      </div>
+    }
+
+    @if (formulaire(); as f) {
+      <app-note-formulaire
+        [matiereId]="m.id"
+        [etudiants]="etudiantsSansNote()"
+        [note]="f.note"
+        (enregistre)="onEnregistre($event)"
+        (annule)="fermerFormulaire()"
+      />
+    }
+
+    @if (notes().length === 0) {
+      <p class="etat">Aucune note saisie pour cette matière.</p>
+    } @else {
+      <p class="resume">
+        {{ notes().length }} note{{ notes().length > 1 ? 's' : '' }} saisie{{ notes().length > 1 ? 's' : '' }}
+        · Moyenne : <strong>{{ moyenne() | number: '1.2-2' }}</strong> / 20
+      </p>
+
+      <div class="tableau">
+        <table>
+          <thead>
+            <tr>
+              <th>N° inscription</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th class="num">Note / 20</th>
+              <th>Saisie le</th>
+              <th>Modifiée le</th>
+              @if (!m.cloturee) {
+                <th></th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            @for (note of notes(); track note.id) {
+              <tr>
+                <td>{{ note.etudiantNumInscription }}</td>
+                <td>{{ note.etudiantNom }}</td>
+                <td>{{ note.etudiantPrenom }}</td>
+                <td class="num">{{ note.valeur | number: '1.2-2' }}</td>
+                <td>{{ note.dateSaisie | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  @if (note.dateModification) {
+                    {{ note.dateModification | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    —
+                  }
+                </td>
+                @if (!m.cloturee) {
+                  <td>
+                    <button
+                      type="button"
+                      class="secondaire petit"
+                      (click)="modifier(note)"
+                      [attr.aria-label]="'Modifier la note de ' + note.etudiantPrenom + ' ' + note.etudiantNom"
+                    >
+                      Modifier
+                    </button>
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</main>

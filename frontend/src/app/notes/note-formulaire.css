@@ -1,0 +1,14 @@
+.formulaire {
+  max-width: 28rem;
+  margin: 1.25rem 0;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.formulaire h2 { margin: 0 0 .5rem; font-size: 1.15rem; }
+
+.etudiant-fixe { margin: 0; font-weight: 600; }
+
+.actions { display: flex; gap: .75rem; margin-top: 1.25rem; }

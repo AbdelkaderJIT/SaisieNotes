@@ -7,3 +7,9 @@ export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   return auth.isLoggedIn() ? true : inject(Router).createUrlTree(['/login']);
 };
+
+// Inverse : la page de connexion n'a pas de sens pour quelqu'un déjà connecté (bouton « Retour » du navigateur).
+export const guestGuard: CanActivateFn = () => {
+  const auth = inject(AuthService);
+  return auth.isLoggedIn() ? inject(Router).createUrlTree(['/matieres']) : true;
+};

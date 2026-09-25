@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tn.espacenote.notedemo.dto.EnseignantResponse;
+import tn.espacenote.notedemo.dto.EtudiantResponse;
 import tn.espacenote.notedemo.dto.MatiereResponse;
 import tn.espacenote.notedemo.dto.NoteForm;
 import tn.espacenote.notedemo.dto.NoteResponse;
@@ -56,6 +57,23 @@ public class NoteService {
         Enseignant enseignant = enseignant(enseignantId);
         return matiereRepository.findByEnseignantsContaining(enseignant).stream()
                 .map(MatiereResponse::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public MatiereResponse matiereDe(Long enseignantId, Long matiereId) {
+        Matiere matiere = matiere(matiereId);
+        verifierAffectation(enseignant(enseignantId), matiere);
+        return MatiereResponse.from(matiere);
+    }
+
+    // Étudiants inscrits à la matière (alimente la liste déroulante du formulaire de saisie)
+    @Transactional(readOnly = true)
+    public List<EtudiantResponse> etudiantsDe(Long enseignantId, Long matiereId) {
+        Matiere matiere = matiere(matiereId);
+        verifierAffectation(enseignant(enseignantId), matiere);
+        return etudiantRepository.findByMatieresContainingOrderByNomAscPrenomAsc(matiere).stream()
+                .map(EtudiantResponse::from)
                 .toList();
     }
 

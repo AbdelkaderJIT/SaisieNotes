@@ -29,6 +29,22 @@
       }
     },
     {
+      "name": "1b. Détail de la matière 1 (200)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres/1"
+      }
+    },
+    {
+      "name": "1c. Étudiants inscrits à la matière 1 (200)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres/1/etudiants"
+      }
+    },
+    {
       "name": "2. Notes de la matière 1 (200)",
       "request": {
         "method": "GET",

@@ -1,0 +1,37 @@
+.entete {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+}
+
+.entete h1 { margin: 0; }
+
+.barre-actions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.confirmation {
+  max-width: 34rem;
+  margin: 1.25rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--danger);
+  border-radius: 12px;
+}
+
+.confirmation p { margin: 0 0 .75rem; }
+.actions { display: flex; gap: .75rem; }
+
+.resume { margin: 1.25rem 0 .75rem; }
+
+.tableau {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}

@@ -1,19 +1,32 @@
-import { Component, inject } from '@angular/core';
-import { AuthService } from '../core/auth.service';
+import { Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
+import { messageErreur } from '../core/erreurs';
+import { Matiere } from '../core/models';
+import { NotesApi } from '../core/notes-api.service';
 
-// Page d'accueil après connexion. Provisoire : la liste des matières arrive à l'étape suivante.
 @Component({
   selector: 'app-matieres',
-  template: `
-    <main class="page">
-      <h1>Mes matières</h1>
-      <p>Bienvenue {{ auth.user()?.prenom }} ! La liste de vos matières arrive à l'étape suivante.</p>
-    </main>
-  `,
-  styles: `
-    .page { max-width: 60rem; margin: 0 auto; padding: 1.5rem 1rem; }
-  `,
+  imports: [RouterLink],
+  templateUrl: './matieres.html',
+  styleUrl: './matieres.css',
 })
 export class Matieres {
-  protected readonly auth = inject(AuthService);
+  private readonly api = inject(NotesApi);
+
+  protected readonly matieres = signal<Matiere[]>([]);
+  protected readonly chargement = signal(true);
+  protected readonly erreur = signal<string | null>(null);
+
+  constructor() {
+    this.api.matieres().subscribe({
+      next: (matieres) => {
+        this.matieres.set([...matieres].sort((a, b) => a.code.localeCompare(b.code)));
+        this.chargement.set(false);
+      },
+      error: (e) => {
+        this.erreur.set(messageErreur(e));
+        this.chargement.set(false);
+      },
+    });
+  }
 }

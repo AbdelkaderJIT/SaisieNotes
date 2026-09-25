@@ -57,6 +57,6 @@ describe('Login', () => {
     backend.expectOne('/api/me').flush({ id: 1, nom: 'Ben Ali', prenom: 'Ali', email: 'ali.benali@fds.tn' });
     await fixture.whenStable();
 
-    expect(naviguer).toHaveBeenCalledWith('/matieres');
+    expect(naviguer).toHaveBeenCalledWith('/matieres', { replaceUrl: true });
   });
 });

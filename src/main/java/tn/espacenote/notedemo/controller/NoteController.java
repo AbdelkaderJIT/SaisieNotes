@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import tn.espacenote.notedemo.dto.EnseignantResponse;
+import tn.espacenote.notedemo.dto.EtudiantResponse;
 import tn.espacenote.notedemo.dto.MatiereResponse;
 import tn.espacenote.notedemo.dto.NoteForm;
 import tn.espacenote.notedemo.dto.NoteModificationForm;
@@ -31,6 +32,16 @@ public class NoteController {
     @GetMapping("/matieres")
     public List<MatiereResponse> matieres(Authentication auth) {
         return noteService.matieresDe(enseignantId(auth));
+    }
+
+    @GetMapping("/matieres/{matiereId}")
+    public MatiereResponse matiere(Authentication auth, @PathVariable Long matiereId) {
+        return noteService.matiereDe(enseignantId(auth), matiereId);
+    }
+
+    @GetMapping("/matieres/{matiereId}/etudiants")
+    public List<EtudiantResponse> etudiants(Authentication auth, @PathVariable Long matiereId) {
+        return noteService.etudiantsDe(enseignantId(auth), matiereId);
     }
 
     @GetMapping("/matieres/{matiereId}/notes")

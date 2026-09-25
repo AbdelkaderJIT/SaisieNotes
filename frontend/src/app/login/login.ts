@@ -33,7 +33,8 @@ export class Login {
     const { email, password } = this.form.getRawValue();
 
     this.auth.login(email, password).subscribe({
-      next: () => void this.router.navigateByUrl('/matieres'),
+      // replaceUrl : /login sort de l'historique, le bouton « Retour » ne ramène pas à l'écran de connexion
+      next: () => void this.router.navigateByUrl('/matieres', { replaceUrl: true }),
       error: (e: HttpErrorResponse) => {
         this.enCours.set(false);
         this.erreur.set(

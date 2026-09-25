@@ -1,0 +1,29 @@
+<main class="page">
+  <h1>Mes matières</h1>
+  <p class="aide">Choisissez une matière pour consulter ses notes.</p>
+
+  @if (chargement()) {
+    <p class="etat">Chargement…</p>
+  } @else if (erreur(); as message) {
+    <p class="erreur" role="alert">{{ message }}</p>
+  } @else if (matieres().length === 0) {
+    <p class="etat">Aucune matière ne vous est affectée pour le moment.</p>
+  } @else {
+    <ul class="grille">
+      @for (matiere of matieres(); track matiere.id) {
+        <li>
+          <a class="carte-matiere" [routerLink]="['/matieres', matiere.id, 'notes']">
+            <span class="code">{{ matiere.code }}</span>
+            <span class="libelle">{{ matiere.libelle }}</span>
+            <span class="meta">
+              Semestre {{ matiere.semestre }}
+              @if (matiere.cloturee) {
+                <span class="badge">Clôturée</span>
+              }
+            </span>
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</main>
