@@ -1,0 +1,55 @@
+@startuml sequence-saisir-note
+title Diagramme de séquence - Saisir une note (API REST)
+autonumber
+
+actor Enseignant
+participant "Client\n(Postman / Angular)" as Client
+participant "Spring Security\n(HTTP Basic)" as Security
+control NoteController
+participant NoteService
+participant GlobalExceptionHandler
+database MatiereRepository
+database EtudiantRepository
+database NoteRepository
+
+Enseignant -> Client : remplit etudiantId et valeur
+Client -> Security : POST /api/matieres/{matiereId}/notes\nAuthorization: Basic ...\n{ "etudiantId": 3, "valeur": 11.5 }
+alt identifiants invalides
+  Security --> Client : 401
+else authentifié
+  Security -> NoteController : requête + Authentication
+  activate NoteController
+  NoteController -> NoteController : @Valid NoteForm\n(format : @NotNull, 0..20, 2 décimales)
+  alt format invalide
+    NoteController --> Client : 400 { champs : { valeur : "..." } }
+  else format valide
+    NoteController -> NoteService : idEnseignantPar(email)
+    NoteController -> NoteService : saisir(enseignantId, matiereId, form)
+    activate NoteService
+
+    NoteService -> MatiereRepository : findById(matiereId)
+    NoteService -> EtudiantRepository : findById(etudiantId)
+
+    group Règles métier
+      NoteService -> NoteService : 1. enseignant affecté à la matière ?  (403)
+      NoteService -> NoteService : 2. matiere.cloturee = false ?  (409)
+      NoteService -> NoteService : 3. étudiant inscrit à la matière ?  (422)
+      NoteService -> NoteService : 4. 0 <= valeur <= 20 ?  (422)
+      NoteService -> NoteRepository : 5. existsByEtudiantAndMatiere(...)  (409 si vrai)
+    end
+
+    alt une règle est violée
+      NoteService --> GlobalExceptionHandler : NoteException(message)
+      deactivate NoteService
+      GlobalExceptionHandler --> Client : statut HTTP + { status, message }
+    else toutes les règles respectées
+      NoteService -> NoteService : new Note(valeur, etudiant,\nmatiere, enseignant) + dateSaisie
+      NoteService -> NoteRepository : save(note)
+      NoteService --> NoteController : NoteResponse
+      NoteController --> Client : 201 Created + NoteResponse (JSON)
+    end
+  end
+  deactivate NoteController
+end
+Client --> Enseignant : résultat affiché
+@enduml

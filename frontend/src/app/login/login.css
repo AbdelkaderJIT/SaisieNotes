@@ -1,0 +1,25 @@
+.login {
+  min-height: calc(100vh - 3.5rem);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.carte {
+  width: 100%;
+  max-width: 24rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.sous-titre {
+  margin: 0 0 .5rem;
+  color: var(--muted);
+}
+
+button[type='submit'] {
+  width: 100%;
+  margin-top: 1.5rem;
+}

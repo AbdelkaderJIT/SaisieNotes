@@ -1,0 +1,9 @@
+@if (auth.user(); as utilisateur) {
+  <header class="barre">
+    <strong>Saisie des notes</strong>
+    <span class="espace"></span>
+    <span>{{ utilisateur.prenom }} {{ utilisateur.nom }}</span>
+    <button type="button" class="secondaire" (click)="auth.logout()">Déconnexion</button>
+  </header>
+}
+<router-outlet />

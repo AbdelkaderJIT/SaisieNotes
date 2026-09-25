@@ -1,0 +1,44 @@
+@startuml class-diagram
+title Diagramme de classes - Gestion des notes
+
+class Enseignant {
+  - id : Long
+  - nom : String
+  - prenom : String
+  - email : String
+}
+class Matiere {
+  - id : Long
+  - code : String
+  - libelle : String
+  - semestre : int
+  - cloturee : boolean
+  + cloturer() : void
+}
+class Etudiant {
+  - id : Long
+  - numInscription : String
+  - nom : String
+  - prenom : String
+  - filiere : String
+  - niveau : String
+}
+class Note {
+  - id : Long
+  - valeur : BigDecimal
+  - dateSaisie : LocalDateTime
+  - dateModification : LocalDateTime
+  + modifier(v : BigDecimal) : void
+}
+Enseignant "1..*" -- "0..*" Matiere : enseigne >
+Etudiant "0..*" -- "1..*" Matiere : inscrit >
+Matiere "1" -- "0..*" Note : concerne >
+Etudiant "1" -- "0..*" Note : obtient >
+Enseignant "1" -- "0..*" Note : saisit >
+note right of Note
+  {unique (etudiant, matiere)}
+  {0 <= valeur <= 20}
+  {matiere.cloturee = false}
+  avant toute saisie ou modification
+end note
+@enduml

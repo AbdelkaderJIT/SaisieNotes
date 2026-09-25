@@ -1,0 +1,144 @@
+{
+  "info": {
+    "name": "NoteDemo - Saisie des notes",
+    "description": "Scénarios de démonstration. Prérequis : application lancée avec les données de démonstration (base vide au premier démarrage). Exécuter dans l'ordre. Les requêtes 3, 7 et 12 modifient les données.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "aliUser", "value": "ali.benali@fds.tn" },
+    { "key": "aliPass", "value": "prof1" },
+    { "key": "soniaUser", "value": "sonia.trabelsi@fds.tn" },
+    { "key": "soniaPass", "value": "prof2" }
+  ],
+  "item": [
+    {
+      "name": "0. Mon profil (200)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "url": "{{baseUrl}}/api/me"
+      }
+    },
+    {
+      "name": "1. Matières d'Ali (200)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres"
+      }
+    },
+    {
+      "name": "2. Notes de la matière 1 (200)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "3. Saisir une note (201)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 3,\n  \"valeur\": 11.5\n}" },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "4. Note déjà existante (409)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 1,\n  \"valeur\": 10\n}" },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "5. Note supérieure à 20 (400)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 4,\n  \"valeur\": 25\n}" },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "6. Étudiant non inscrit (422)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 5,\n  \"valeur\": 10\n}" },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "7. Modifier une note (200)",
+      "request": {
+        "method": "PUT",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"valeur\": 15.25\n}" },
+        "url": "{{baseUrl}}/api/notes/1"
+      }
+    },
+    {
+      "name": "8. Matière non affectée à Sonia (403)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{soniaUser}}" }, { "key": "password", "value": "{{soniaPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres/1/notes"
+      }
+    },
+    {
+      "name": "9. Saisie dans une matière clôturée (409)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{soniaUser}}" }, { "key": "password", "value": "{{soniaPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 4,\n  \"valeur\": 10\n}" },
+        "url": "{{baseUrl}}/api/matieres/3/notes"
+      }
+    },
+    {
+      "name": "10. Modification dans une matière clôturée (409)",
+      "request": {
+        "method": "PUT",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{soniaUser}}" }, { "key": "password", "value": "{{soniaPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"valeur\": 18\n}" },
+        "url": "{{baseUrl}}/api/notes/3"
+      }
+    },
+    {
+      "name": "11. Sans authentification (401)",
+      "request": {
+        "method": "GET",
+        "auth": { "type": "noauth" },
+        "url": "{{baseUrl}}/api/matieres"
+      }
+    },
+    {
+      "name": "12. Clôturer la matière 4 (200)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{soniaUser}}" }, { "key": "password", "value": "{{soniaPass}}" } ] },
+        "url": "{{baseUrl}}/api/matieres/4/cloturer"
+      }
+    },
+    {
+      "name": "13. Saisie après clôture (409)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{soniaUser}}" }, { "key": "password", "value": "{{soniaPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 5,\n  \"valeur\": 12\n}" },
+        "url": "{{baseUrl}}/api/matieres/4/notes"
+      }
+    }
+  ]
+}

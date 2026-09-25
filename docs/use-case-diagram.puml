@@ -1,0 +1,50 @@
+@startuml use-case-diagram
+title Diagramme de cas d'utilisation - Enseignant
+left to right direction
+
+actor Enseignant
+
+rectangle "Espace Notes (API REST)" {
+  usecase "S'authentifier" as UC0
+  usecase "Consulter les notes\nd'une matière" as UC1
+  usecase "Saisir une note" as UC2
+  usecase "Modifier une note" as UC3
+  usecase "Clôturer une matière" as UC4
+}
+
+Enseignant --> UC1
+Enseignant --> UC2
+Enseignant --> UC3
+Enseignant --> UC4
+
+UC1 ..> UC0 : <<include>>
+UC2 ..> UC0 : <<include>>
+UC3 ..> UC0 : <<include>>
+UC4 ..> UC0 : <<include>>
+
+note right of UC1
+  Seulement les matières
+  affectées à l'enseignant
+  par l'administration (enseigne)
+end note
+
+note right of UC2
+  Refusée si :
+  - matière non affectée (403)
+  - matière clôturée (409)
+  - étudiant non inscrit (422)
+  - valeur hors [0, 20] (400 / 422)
+  - note déjà existante (409)
+end note
+
+note right of UC3
+  Refusée si la matière est
+  non affectée, clôturée,
+  ou si la valeur est hors [0, 20]
+end note
+
+note right of UC4
+  Définitif : plus aucune
+  saisie ni modification ensuite
+end note
+@enduml

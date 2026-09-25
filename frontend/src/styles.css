@@ -1,0 +1,86 @@
+/* Styles globaux : variables de couleur (clair / sombre) et éléments de base partagés par toutes les pages. */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --text: #1c2430;
+  --muted: #5b6675;
+  --border: #d5dae1;
+  --primary: #1f5fbf;
+  --primary-text: #ffffff;
+  --danger: #b3261e;
+  --danger-bg: #fdecea;
+  --radius: 8px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12161c;
+    --surface: #1b212a;
+    --text: #e6e9ee;
+    --muted: #9aa5b4;
+    --border: #2f3844;
+    --primary: #6ea2f0;
+    --primary-text: #0b1220;
+    --danger: #f2a29c;
+    --danger-bg: #3a1f1d;
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+h1 { font-size: 1.5rem; margin: 0 0 .25rem; }
+
+label { display: block; font-weight: 600; margin: 1rem 0 .25rem; }
+
+input {
+  width: 100%;
+  padding: .6rem .75rem;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+input:focus-visible, button:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+  padding: .6rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled { opacity: .6; cursor: not-allowed; }
+
+button.secondaire {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.erreur {
+  margin: 1rem 0 0;
+  padding: .6rem .75rem;
+  border-radius: var(--radius);
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.champ-erreur { margin: .25rem 0 0; font-size: .875rem; color: var(--danger); }
