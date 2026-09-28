@@ -93,6 +93,16 @@
       }
     },
     {
+      "name": "6b. Étudiant suivi par une collègue dans la même matière (403)",
+      "request": {
+        "method": "POST",
+        "auth": { "type": "basic", "basic": [ { "key": "username", "value": "{{aliUser}}" }, { "key": "password", "value": "{{aliPass}}" } ] },
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": { "mode": "raw", "raw": "{\n  \"etudiantId\": 4,\n  \"valeur\": 10\n}" },
+        "url": "{{baseUrl}}/api/matieres/2/notes"
+      }
+    },
+    {
       "name": "7. Modifier une note (200)",
       "request": {
         "method": "PUT",

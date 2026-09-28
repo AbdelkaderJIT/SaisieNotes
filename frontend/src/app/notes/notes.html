@@ -21,7 +21,7 @@
         </button>
         <button type="button" class="secondaire" (click)="demanderCloture()">Clôturer la matière</button>
         @if (etudiantsSansNote().length === 0) {
-          <span class="aide">Tous les étudiants inscrits ont déjà une note.</span>
+          <span class="aide">Tous vos étudiants ont déjà une note.</span>
         }
       </div>
     } @else {
@@ -63,7 +63,6 @@
     } @else {
       <p class="resume">
         {{ notes().length }} note{{ notes().length > 1 ? 's' : '' }} saisie{{ notes().length > 1 ? 's' : '' }}
-        · Moyenne : <strong>{{ moyenne() | number: '1.2-2' }}</strong> / 20
       </p>
 
       <div class="tableau">

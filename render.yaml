@@ -1,0 +1,21 @@
+# Blueprint Render : crée le service web à partir du Dockerfile.
+# Utilisation : Render > New > Blueprint > choisir ce dépôt.
+#
+# Les valeurs sensibles ne sont PAS dans ce fichier (le dépôt est public) : Render les demande
+# dans son interface au moment de créer le service (sync: false).
+services:
+  - type: web
+    name: saisie-notes
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: frankfurt          # choisir la région la plus proche de la base Aiven
+    healthCheckPath: /         # Spring Boot sert la page d'accueil d'Angular sur /
+    envVars:
+      - key: DB_URL            # jdbc:mysql://HOTE:PORT/defaultdb?sslMode=REQUIRED  (à saisir dans Render)
+        sync: false
+      - key: DB_USER
+        value: avnadmin
+      - key: DB_PASSWORD       # mot de passe Aiven (à saisir dans Render)
+        sync: false
+      # Facultatif : DEMO_ALI_PASSWORD et DEMO_SONIA_PASSWORD (par défaut prof1 / prof2)

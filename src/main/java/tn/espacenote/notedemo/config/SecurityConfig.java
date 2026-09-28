@@ -1,5 +1,6 @@
 package tn.espacenote.notedemo.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -27,6 +28,10 @@ public class SecurityConfig {
             .authorizeHttpRequests(a -> a
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // préflight CORS d'Angular
                     .requestMatchers("/api/**").authenticated()
+                    // Fichiers de l'application Angular (pages, JS, CSS, images), lecture seule et publics :
+                    // ils ne contiennent aucune donnée. Toutes les données passent par /api, protégé ci-dessus
+                    // (les règles sont évaluées dans l'ordre : /api/** est traité avant ce GET général).
+                    .requestMatchers(HttpMethod.GET, "/**").permitAll()
                     .anyRequest().denyAll())
             // 401 sans en-tête WWW-Authenticate : sinon le navigateur ouvre sa propre fenêtre de
             // connexion par-dessus la page de login Angular quand le mot de passe est faux.
@@ -42,10 +47,13 @@ public class SecurityConfig {
     // Deux comptes de démonstration. Le nom d'utilisateur est l'email de l'Enseignant en base,
     // ce qui relie l'utilisateur connecté à ses matières (voir NoteService.idEnseignantPar).
     // L'Enseignant n'a pas de champ mot de passe : l'authentification reste hors du modèle métier.
+    // Les mots de passe viennent de la configuration (variables d'environnement en production).
     @Bean
-    UserDetailsService userDetailsService(PasswordEncoder encoder) {
+    UserDetailsService userDetailsService(PasswordEncoder encoder,
+                                          @Value("${app.demo.ali-password}") String motDePasseAli,
+                                          @Value("${app.demo.sonia-password}") String motDePasseSonia) {
         return new InMemoryUserDetailsManager(
-                User.withUsername("ali.benali@fds.tn").password(encoder.encode("prof1")).roles("ENSEIGNANT").build(),
-                User.withUsername("sonia.trabelsi@fds.tn").password(encoder.encode("prof2")).roles("ENSEIGNANT").build());
+                User.withUsername("ali.benali@fds.tn").password(encoder.encode(motDePasseAli)).roles("ENSEIGNANT").build(),
+                User.withUsername("sonia.trabelsi@fds.tn").password(encoder.encode(motDePasseSonia)).roles("ENSEIGNANT").build());
     }
 }

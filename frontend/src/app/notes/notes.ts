@@ -35,11 +35,6 @@ export class Notes {
   protected readonly erreurAction = signal<string | null>(null);
   protected readonly clotureDemandee = signal(false);
 
-  protected readonly moyenne = computed(() => {
-    const notes = this.notes();
-    return notes.length === 0 ? null : notes.reduce((somme, n) => somme + n.valeur, 0) / notes.length;
-  });
-
   // Une seule note par étudiant et par matière : la liste de saisie ne propose que ceux qui n'en ont pas
   protected readonly etudiantsSansNote = computed(() => {
     const notes = this.notes();

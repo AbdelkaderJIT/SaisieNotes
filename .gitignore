@@ -1,5 +1,7 @@
 HELP.md
 target/
+# Application Angular compilée, copiée ici par le Dockerfile : c'est un résultat de build, jamais commité
+src/main/resources/static/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

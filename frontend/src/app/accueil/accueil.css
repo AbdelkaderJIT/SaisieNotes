@@ -1,0 +1,60 @@
+.accueil {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.5rem;
+  padding: 2.5rem 1rem;
+  border-top: 4px solid #c8102e;   /* rouge du drapeau tunisien */
+  text-align: center;
+}
+
+.officiel {
+  max-width: 42rem;
+}
+
+.officiel p {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* Fond blanc fixe : l'image des armoiries n'est pas transparente, elle doit rester lisible en thème sombre */
+.armoiries {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: .5rem .75rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.armoiries img { display: block; }
+
+.republique { font-size: 1.05rem; }
+.ministere { font-size: .95rem; }
+.universite { font-size: 1.1rem; }
+.faculte { font-size: 1.3rem; }
+
+.separateur {
+  color: var(--muted);
+  font-weight: 400 !important;
+  line-height: 1.8 !important;
+}
+
+.application {
+  width: 100%;
+  max-width: 30rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.application h1 { margin-bottom: .5rem; }
+
+.application p {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}

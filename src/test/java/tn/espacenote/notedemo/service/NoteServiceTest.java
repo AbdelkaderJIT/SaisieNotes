@@ -12,10 +12,12 @@ import tn.espacenote.notedemo.dto.NoteResponse;
 import tn.espacenote.notedemo.exception.*;
 import tn.espacenote.notedemo.model.Enseignant;
 import tn.espacenote.notedemo.model.Etudiant;
+import tn.espacenote.notedemo.model.Inscription;
 import tn.espacenote.notedemo.model.Matiere;
 import tn.espacenote.notedemo.model.Note;
 import tn.espacenote.notedemo.repository.EnseignantRepository;
 import tn.espacenote.notedemo.repository.EtudiantRepository;
+import tn.espacenote.notedemo.repository.InscriptionRepository;
 import tn.espacenote.notedemo.repository.MatiereRepository;
 import tn.espacenote.notedemo.repository.NoteRepository;
 
@@ -40,13 +42,14 @@ class NoteServiceTest {
     @Mock EnseignantRepository enseignantRepository;
     @Mock MatiereRepository matiereRepository;
     @Mock EtudiantRepository etudiantRepository;
+    @Mock InscriptionRepository inscriptionRepository;
     @Mock NoteRepository noteRepository;
     @InjectMocks NoteService service;
 
-    private Enseignant ali;      // affecté à la matière
-    private Enseignant sonia;    // non affectée
+    private Enseignant ali;      // enseigne la matière, et a Amine en charge
+    private Enseignant sonia;    // n'enseigne pas la matière
     private Matiere algo;
-    private Etudiant amine;      // inscrit à la matière
+    private Etudiant amine;      // inscrit à la matière, suivi par Ali
 
     @BeforeEach
     void fixtures() {
@@ -54,13 +57,18 @@ class NoteServiceTest {
         algo.setLibelle("Algorithmique");
 
         ali = new Enseignant();
+        ali.setId(ALI_ID);
         ali.getMatieres().add(algo);
         sonia = new Enseignant();
+        sonia.setId(SONIA_ID);
 
         amine = new Etudiant();
         amine.setNom("Gharbi");
         amine.setPrenom("Amine");
-        amine.getMatieres().add(algo);
+
+        // Amine est inscrit à la matière, sous la responsabilité d'Ali
+        lenient().when(inscriptionRepository.findByEtudiantAndMatiere(amine, algo))
+                .thenReturn(Optional.of(new Inscription(amine, algo, ali)));
 
         lenient().when(enseignantRepository.findById(ALI_ID)).thenReturn(Optional.of(ali));
         lenient().when(enseignantRepository.findById(SONIA_ID)).thenReturn(Optional.of(sonia));
@@ -118,9 +126,33 @@ class NoteServiceTest {
 
     @Test
     void saisir_etudiantNonInscrit_estRefuse() {
-        amine.getMatieres().clear();
+        when(inscriptionRepository.findByEtudiantAndMatiere(amine, algo)).thenReturn(Optional.empty());
         assertThrows(EtudiantNonInscritException.class, () -> service.saisir(ALI_ID, MATIERE_ID, form("12")));
         verify(noteRepository, never()).save(any());
+    }
+
+    // Deux enseignants d'une même matière : chacun ne gère que SES étudiants
+    private Enseignant collegueQuiEnseigneLaMemeMatiere() {
+        Enseignant collegue = new Enseignant();
+        collegue.setId(3L);
+        collegue.getMatieres().add(algo);
+        return collegue;
+    }
+
+    @Test
+    void saisir_etudiantSuiviParUnCollegue_estRefuse() {
+        Enseignant collegue = collegueQuiEnseigneLaMemeMatiere();
+        when(inscriptionRepository.findByEtudiantAndMatiere(amine, algo))
+                .thenReturn(Optional.of(new Inscription(amine, algo, collegue)));
+
+        assertThrows(EtudiantAutreEnseignantException.class, () -> service.saisir(ALI_ID, MATIERE_ID, form("12")));
+        verify(noteRepository, never()).save(any());
+    }
+
+    @Test
+    void inscription_unEtudiantNePeutEtreConfieQuAUnEnseignantDeLaMatiere() {
+        // Sonia n'enseigne pas la matière : on ne peut pas lui confier d'étudiant dedans
+        assertThrows(IllegalArgumentException.class, () -> new Inscription(amine, algo, sonia));
     }
 
     @Test
@@ -185,6 +217,18 @@ class NoteServiceTest {
     }
 
     @Test
+    void modifier_noteDunEtudiantSuiviParUnCollegue_estRefusee() {
+        Note n = noteExistante();
+        Enseignant collegue = collegueQuiEnseigneLaMemeMatiere();
+        when(inscriptionRepository.findByEtudiantAndMatiere(amine, algo))
+                .thenReturn(Optional.of(new Inscription(amine, algo, collegue)));
+
+        assertThrows(EtudiantAutreEnseignantException.class, () -> service.modifier(ALI_ID, NOTE_ID, new BigDecimal("15")));
+        assertEquals(new BigDecimal("10.00"), n.getValeur());
+        assertNull(n.getDateModification());
+    }
+
+    @Test
     void modifier_noteSuperieureA20_estRejetee() {
         Note n = noteExistante();
         assertThrows(ValeurInvalideException.class, () -> service.modifier(ALI_ID, NOTE_ID, new BigDecimal("21")));
@@ -202,7 +246,18 @@ class NoteServiceTest {
     @Test
     void notesDe_enseignantNonAffecte_estRefuse() {
         assertThrows(AccesMatiereRefuseException.class, () -> service.notesDe(SONIA_ID, MATIERE_ID));
-        verify(noteRepository, never()).findByMatiere(any());
+        verify(noteRepository, never()).findVisiblesPar(any(), any());
+    }
+
+    @Test
+    void notesDe_neRenvoieQueLesNotesDesEtudiantsDeLEnseignant() {
+        Note note = new Note(new BigDecimal("14.50"), amine, algo, ali);
+        when(noteRepository.findVisiblesPar(algo, ali)).thenReturn(List.of(note));
+
+        var notes = service.notesDe(ALI_ID, MATIERE_ID);
+
+        assertEquals(1, notes.size());
+        assertEquals(new BigDecimal("14.50"), notes.get(0).valeur());
     }
 
     @Test
@@ -216,8 +271,8 @@ class NoteServiceTest {
     }
 
     @Test
-    void etudiantsDe_renvoieLesInscrits() {
-        when(etudiantRepository.findByMatieresContainingOrderByNomAscPrenomAsc(algo)).thenReturn(List.of(amine));
+    void etudiantsDe_renvoieLesEtudiantsDeLEnseignant() {
+        when(inscriptionRepository.etudiantsDe(algo, ali)).thenReturn(List.of(amine));
 
         var etudiants = service.etudiantsDe(ALI_ID, MATIERE_ID);
 
@@ -228,7 +283,7 @@ class NoteServiceTest {
     @Test
     void etudiantsDe_enseignantNonAffecte_estRefuse() {
         assertThrows(AccesMatiereRefuseException.class, () -> service.etudiantsDe(SONIA_ID, MATIERE_ID));
-        verify(etudiantRepository, never()).findByMatieresContainingOrderByNomAscPrenomAsc(any());
+        verify(inscriptionRepository, never()).etudiantsDe(any(), any());
     }
 
     @Test

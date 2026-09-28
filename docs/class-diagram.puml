@@ -6,6 +6,7 @@ class Enseignant {
   - nom : String
   - prenom : String
   - email : String
+  + enseigne(m : Matiere) : boolean
 }
 class Matiere {
   - id : Long
@@ -23,6 +24,9 @@ class Etudiant {
   - filiere : String
   - niveau : String
 }
+class Inscription {
+  - id : Long
+}
 class Note {
   - id : Long
   - valeur : BigDecimal
@@ -30,15 +34,31 @@ class Note {
   - dateModification : LocalDateTime
   + modifier(v : BigDecimal) : void
 }
+
 Enseignant "1..*" -- "0..*" Matiere : enseigne >
-Etudiant "0..*" -- "1..*" Matiere : inscrit >
+
+' Inscription : un étudiant suivi dans une matière par UN enseignant
+Etudiant "1" -- "0..*" Inscription : est inscrit >
+Matiere "1" -- "0..*" Inscription : accueille >
+Enseignant "1" -- "0..*" Inscription : a en charge >
+
 Matiere "1" -- "0..*" Note : concerne >
 Etudiant "1" -- "0..*" Note : obtient >
 Enseignant "1" -- "0..*" Note : saisit >
+
+note right of Inscription
+  {unique (etudiant, matiere)}
+  un étudiant n'a qu'un enseignant
+  par matière ; l'enseignant doit
+  enseigner cette matière
+end note
+
 note right of Note
   {unique (etudiant, matiere)}
   {0 <= valeur <= 20}
   {matiere.cloturee = false}
   avant toute saisie ou modification
+  {seul l'enseignant de l'inscription
+  saisit / modifie la note}
 end note
 @enduml

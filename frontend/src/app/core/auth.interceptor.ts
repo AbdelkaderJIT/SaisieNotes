@@ -17,7 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req.clone({ setHeaders: { Authorization: authorization } })).pipe(
     catchError((erreur) => {
       if (erreur.status === 401) {
-        auth.logout();
+        auth.logout('/login');
       }
       return throwError(() => erreur);
     }),

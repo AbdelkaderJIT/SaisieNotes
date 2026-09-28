@@ -73,6 +73,18 @@ button {
 
 button:disabled { opacity: .6; cursor: not-allowed; }
 
+/* Lien qui a l'apparence d'un bouton principal (navigation, pas action) */
+a.bouton {
+  display: inline-block;
+  padding: .6rem 1.5rem;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+a.bouton:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
 button.secondaire {
   background: transparent;
   color: var(--text);

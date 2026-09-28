@@ -28,6 +28,7 @@ public class GlobalExceptionHandler {
     private static final Map<Class<? extends NoteException>, HttpStatus> STATUTS = Map.of(
             RessourceIntrouvableException.class, HttpStatus.NOT_FOUND,
             AccesMatiereRefuseException.class, HttpStatus.FORBIDDEN,
+            EtudiantAutreEnseignantException.class, HttpStatus.FORBIDDEN,
             MatiereClotureeException.class, HttpStatus.CONFLICT,
             NoteDejaExistanteException.class, HttpStatus.CONFLICT,
             EtudiantNonInscritException.class, HttpStatus.UNPROCESSABLE_ENTITY,

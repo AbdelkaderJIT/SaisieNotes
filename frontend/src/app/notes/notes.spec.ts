@@ -74,12 +74,14 @@ describe('Notes', () => {
 
   // ---- consultation ----
 
-  it('affiche la matière, la moyenne et les notes triées par nom', async () => {
+  it('affiche la matière et les notes triées par nom, chacune avec sa propre valeur', async () => {
     await repondre(ALGO, [note(2, 'Mansour', 12.75), note(1, 'Gharbi', 14.5, '2026-09-25T10:00:00')]);
 
     expect(page.querySelector('h1')?.textContent).toContain('Algorithmique');
     expect(page.textContent).toContain('2 notes saisies');
-    expect(page.textContent).toContain('13,63');   // (14,5 + 12,75) / 2, format français
+    expect(page.textContent).not.toContain('Moyenne');   // pas de note commune à plusieurs étudiants
+    expect(page.textContent).toContain('14,50');          // format français
+    expect(page.textContent).toContain('12,75');
 
     const lignes = Array.from(page.querySelectorAll('tbody tr'));
     expect(lignes.length).toBe(2);
@@ -141,7 +143,7 @@ describe('Notes', () => {
     await repondre(ALGO, [note(1, 'Gharbi', 14.5)], [etudiant(1, 'Gharbi')]);
 
     expect(bouton('Ajouter une note')?.disabled).toBe(true);
-    expect(page.textContent).toContain('Tous les étudiants inscrits ont déjà une note');
+    expect(page.textContent).toContain('Tous vos étudiants ont déjà une note');
   });
 
   it('ajoute la note enregistrée au tableau et confirme', async () => {

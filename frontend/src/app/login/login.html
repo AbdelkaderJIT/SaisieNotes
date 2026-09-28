@@ -1,26 +1,31 @@
 <main class="login">
-  <form class="carte" [formGroup]="form" (ngSubmit)="seConnecter()" novalidate>
-    <h1>Saisie des notes</h1>
-    <p class="sous-titre">Connectez-vous avec votre compte enseignant</p>
+  <div class="colonne">
+    <a class="retour" routerLink="/">← Accueil</a>
 
-    <label for="email">Email</label>
-    <input id="email" type="email" formControlName="email" autocomplete="username" />
-    @if (form.controls.email.touched && form.controls.email.invalid) {
-      <p class="champ-erreur">Saisissez une adresse email valide</p>
-    }
+    <form class="carte" [formGroup]="form" (ngSubmit)="seConnecter()" novalidate>
+      <p class="etablissement">Faculté de Droit de Sfax</p>
+      <h1>Saisie des notes</h1>
+      <p class="sous-titre">Connectez-vous avec votre compte enseignant</p>
 
-    <label for="password">Mot de passe</label>
-    <input id="password" type="password" formControlName="password" autocomplete="current-password" />
-    @if (form.controls.password.touched && form.controls.password.invalid) {
-      <p class="champ-erreur">Le mot de passe est obligatoire</p>
-    }
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" autocomplete="username" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <p class="champ-erreur">Saisissez une adresse email valide</p>
+      }
 
-    @if (erreur(); as message) {
-      <p class="erreur" role="alert">{{ message }}</p>
-    }
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" formControlName="password" autocomplete="current-password" />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <p class="champ-erreur">Le mot de passe est obligatoire</p>
+      }
 
-    <button type="submit" [disabled]="enCours()">
-      {{ enCours() ? 'Connexion…' : 'Se connecter' }}
-    </button>
-  </form>
+      @if (erreur(); as message) {
+        <p class="erreur" role="alert">{{ message }}</p>
+      }
+
+      <button type="submit" [disabled]="enCours()">
+        {{ enCours() ? 'Connexion…' : 'Se connecter' }}
+      </button>
+    </form>
+  </div>
 </main>

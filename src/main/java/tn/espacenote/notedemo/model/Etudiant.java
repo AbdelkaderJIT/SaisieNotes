@@ -5,9 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
@@ -31,14 +28,5 @@ public class Etudiant {
 
     private String niveau;
 
-    // "inscrit" : permet de refuser une note pour un étudiant non inscrit
-    @ManyToMany
-    @JoinTable(name = "inscrit",
-            joinColumns = @JoinColumn(name = "etudiant_id"),
-            inverseJoinColumns = @JoinColumn(name = "matiere_id"))
-    private Set<Matiere> matieres = new HashSet<>();
-
-    public boolean estInscritA(Matiere matiere) {
-        return matieres.contains(matiere);
-    }
+    // Les matières de l'étudiant (et leur enseignant) sont portées par Inscription.
 }

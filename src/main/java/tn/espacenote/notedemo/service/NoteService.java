@@ -11,10 +11,12 @@ import tn.espacenote.notedemo.dto.NoteResponse;
 import tn.espacenote.notedemo.exception.*;
 import tn.espacenote.notedemo.model.Enseignant;
 import tn.espacenote.notedemo.model.Etudiant;
+import tn.espacenote.notedemo.model.Inscription;
 import tn.espacenote.notedemo.model.Matiere;
 import tn.espacenote.notedemo.model.Note;
 import tn.espacenote.notedemo.repository.EnseignantRepository;
 import tn.espacenote.notedemo.repository.EtudiantRepository;
+import tn.espacenote.notedemo.repository.InscriptionRepository;
 import tn.espacenote.notedemo.repository.MatiereRepository;
 import tn.espacenote.notedemo.repository.NoteRepository;
 
@@ -34,6 +36,7 @@ public class NoteService {
     private final EnseignantRepository enseignantRepository;
     private final MatiereRepository matiereRepository;
     private final EtudiantRepository etudiantRepository;
+    private final InscriptionRepository inscriptionRepository;
     private final NoteRepository noteRepository;
 
     // Relie l'utilisateur authentifié (son email) à l'Enseignant en base
@@ -67,21 +70,25 @@ public class NoteService {
         return MatiereResponse.from(matiere);
     }
 
-    // Étudiants inscrits à la matière (alimente la liste déroulante du formulaire de saisie)
+    // Les étudiants que CET enseignant a en charge dans la matière (liste déroulante de saisie).
+    // Un collègue qui enseigne la même matière à d'autres étudiants n'apparaît pas ici.
     @Transactional(readOnly = true)
     public List<EtudiantResponse> etudiantsDe(Long enseignantId, Long matiereId) {
         Matiere matiere = matiere(matiereId);
-        verifierAffectation(enseignant(enseignantId), matiere);
-        return etudiantRepository.findByMatieresContainingOrderByNomAscPrenomAsc(matiere).stream()
+        Enseignant enseignant = enseignant(enseignantId);
+        verifierAffectation(enseignant, matiere);
+        return inscriptionRepository.etudiantsDe(matiere, enseignant).stream()
                 .map(EtudiantResponse::from)
                 .toList();
     }
 
+    // Les notes des étudiants de CET enseignant uniquement
     @Transactional(readOnly = true)
     public List<NoteResponse> notesDe(Long enseignantId, Long matiereId) {
         Matiere matiere = matiere(matiereId);
-        verifierAffectation(enseignant(enseignantId), matiere);
-        return noteRepository.findByMatiere(matiere).stream()
+        Enseignant enseignant = enseignant(enseignantId);
+        verifierAffectation(enseignant, matiere);
+        return noteRepository.findVisiblesPar(matiere, enseignant).stream()
                 .map(NoteResponse::from)
                 .toList();
     }
@@ -95,9 +102,7 @@ public class NoteService {
 
         Etudiant etudiant = etudiantRepository.findById(form.getEtudiantId())
                 .orElseThrow(() -> new RessourceIntrouvableException("Étudiant", form.getEtudiantId()));
-        if (!etudiant.estInscritA(matiere)) {              // 3. étudiant inscrit
-            throw new EtudiantNonInscritException(nomComplet(etudiant), matiere.getLibelle());
-        }
+        verifierEtudiantDeLEnseignant(enseignant, matiere, etudiant);   // 3. inscrit, et suivi par CET enseignant
 
         verifierValeur(form.getValeur());                  // 4. 0 <= valeur <= 20
 
@@ -113,9 +118,11 @@ public class NoteService {
         Note note = noteRepository.findById(noteId)
                 .orElseThrow(() -> new RessourceIntrouvableException("Note", noteId));
         Matiere matiere = note.getMatiere();
+        Enseignant enseignant = enseignant(enseignantId);
 
-        verifierAffectation(enseignant(enseignantId), matiere);
+        verifierAffectation(enseignant, matiere);
         verifierNonCloturee(matiere);
+        verifierEtudiantDeLEnseignant(enseignant, matiere, note.getEtudiant());   // pas la note d'un collègue
         verifierValeur(valeur);
 
         note.modifier(normaliser(valeur));   // met à jour dateModification ; flush au commit
@@ -135,6 +142,16 @@ public class NoteService {
     private void verifierAffectation(Enseignant enseignant, Matiere matiere) {
         if (!enseignant.enseigne(matiere)) {
             throw new AccesMatiereRefuseException(matiere.getLibelle());
+        }
+    }
+
+    // Un étudiant a UN enseignant par matière (Inscription) : seul cet enseignant peut saisir ou
+    // modifier sa note. Deux enseignants d'une même matière ne se marchent donc pas dessus.
+    private void verifierEtudiantDeLEnseignant(Enseignant enseignant, Matiere matiere, Etudiant etudiant) {
+        Inscription inscription = inscriptionRepository.findByEtudiantAndMatiere(etudiant, matiere)
+                .orElseThrow(() -> new EtudiantNonInscritException(nomComplet(etudiant), matiere.getLibelle()));
+        if (!inscription.getEnseignant().getId().equals(enseignant.getId())) {
+            throw new EtudiantAutreEnseignantException(nomComplet(etudiant), matiere.getLibelle());
         }
     }
 

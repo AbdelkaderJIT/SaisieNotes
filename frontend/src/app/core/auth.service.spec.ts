@@ -109,6 +109,6 @@ describe('AuthService + authInterceptor', () => {
 
     expect(auth.isLoggedIn()).toBe(false);
     expect(auth.authorizationHeader()).toBeNull();
-    expect(naviguer).toHaveBeenCalledWith('/login');
+    expect(naviguer).toHaveBeenCalledWith('/');   // retour à la page d'accueil
   });
 });

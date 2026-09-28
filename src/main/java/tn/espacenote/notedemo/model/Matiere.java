@@ -32,9 +32,6 @@ public class Matiere {
     @ManyToMany(mappedBy = "matieres")
     private Set<Enseignant> enseignants = new HashSet<>();
 
-    @ManyToMany(mappedBy = "matieres")
-    private Set<Etudiant> etudiants = new HashSet<>();
-
     public void cloturer() {
         this.cloturee = true;
     }

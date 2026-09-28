@@ -1,0 +1,22 @@
+# Ne pas envoyer à Docker ce qui est inutile ou recréé pendant le build
+.git
+.idea
+.vscode
+.gitignore
+.gitattributes
+
+# Java
+target
+HELP.md
+
+# Angular
+frontend/node_modules
+frontend/dist
+frontend/.angular
+
+# Résultat de build copié par le Dockerfile
+src/main/resources/static
+
+# Documentation
+docs
+README.md

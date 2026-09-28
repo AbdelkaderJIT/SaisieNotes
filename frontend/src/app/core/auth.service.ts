@@ -36,10 +36,11 @@ export class AuthService {
       );
   }
 
-  logout(): void {
+  // Déconnexion volontaire : retour à l'accueil. Une session expirée (401) passe '/login'.
+  logout(destination = '/'): void {
     this.authorization = null;
     this.utilisateur.set(null);
-    void this.router.navigateByUrl('/login');
+    void this.router.navigateByUrl(destination);
   }
 
   // Lu par l'intercepteur pour signer chaque requête /api.

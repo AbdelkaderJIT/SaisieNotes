@@ -9,3 +9,9 @@
 }
 
 .espace { flex: 1; }
+
+.etablissement { color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 40rem) {
+  .etablissement { display: none; }
+}
