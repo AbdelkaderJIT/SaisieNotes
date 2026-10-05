@@ -14,12 +14,17 @@ export const routes: Routes = [
     loadComponent: () => import('./login/login').then((m) => m.Login),
   },
   {
-    path: 'matieres',
+    path: 'examens',
     canActivate: [authGuard],
-    loadComponent: () => import('./matieres/matieres').then((m) => m.Matieres),
+    loadComponent: () => import('./examens/examens').then((m) => m.Examens),
   },
   {
-    path: 'matieres/:id/notes',
+    path: 'examens/:id/groupes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./groupes/groupes').then((m) => m.Groupes),
+  },
+  {
+    path: 'examens/:id/groupes/:groupeId/notes',
     canActivate: [authGuard],
     loadComponent: () => import('./notes/notes').then((m) => m.Notes),
   },

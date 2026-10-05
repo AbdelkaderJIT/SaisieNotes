@@ -45,7 +45,7 @@ public class SecurityConfig {
     }
 
     // Deux comptes de démonstration. Le nom d'utilisateur est l'email de l'Enseignant en base,
-    // ce qui relie l'utilisateur connecté à ses matières (voir NoteService.idEnseignantPar).
+    // ce qui relie l'utilisateur connecté à ses examens (voir ExamenService.idEnseignantPar).
     // L'Enseignant n'a pas de champ mot de passe : l'authentification reste hors du modèle métier.
     // Les mots de passe viennent de la configuration (variables d'environnement en production).
     @Bean

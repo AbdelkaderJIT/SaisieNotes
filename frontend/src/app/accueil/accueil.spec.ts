@@ -1,17 +1,21 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { Accueil } from './accueil';
 
 describe('Accueil', () => {
+  let fixture: ComponentFixture<Accueil>;
   let page: HTMLElement;
 
   beforeEach(async () => {
+    localStorage.clear();
+    document.documentElement.removeAttribute('data-theme');
+
     await TestBed.configureTestingModule({
       imports: [Accueil],
       providers: [provideRouter([])],
     }).compileComponents();
 
-    const fixture = TestBed.createComponent(Accueil);
+    fixture = TestBed.createComponent(Accueil);
     page = fixture.nativeElement as HTMLElement;
     await fixture.whenStable();
   });
@@ -32,5 +36,18 @@ describe('Accueil', () => {
 
   it('décrit l\'image des armoiries pour les lecteurs d\'écran', () => {
     expect(page.querySelector('img')?.getAttribute('alt')).toContain('Armoiries');
+  });
+
+  it('propose un choix de thème, appliqué immédiatement et mémorisé', async () => {
+    const boutons = Array.from(page.querySelectorAll('.theme-switch button')) as HTMLButtonElement[];
+    expect(boutons.map((b) => b.textContent?.trim())).toEqual(['Clair', 'Sombre']);
+    expect(boutons.some((b) => b.classList.contains('actif'))).toBe(false);   // aucun choix explicite au départ
+
+    boutons.find((b) => b.textContent?.trim() === 'Sombre')!.click();
+    await fixture.whenStable();
+
+    expect(document.documentElement.getAttribute('data-theme')).toBe('sombre');
+    expect(localStorage.getItem('notedemo-theme')).toBe('sombre');
+    expect(boutons.find((b) => b.textContent?.trim() === 'Sombre')?.classList.contains('actif')).toBe(true);
   });
 });

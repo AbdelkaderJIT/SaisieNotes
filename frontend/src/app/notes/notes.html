@@ -1,31 +1,31 @@
-<main class="page">
-  <a class="retour" routerLink="/matieres">← Mes matières</a>
+<main class="page" (document:keydown.escape)="fermerFormulaire()">
+  <a class="retour" [routerLink]="['/examens', id(), 'groupes']">← Choisir un autre groupe</a>
 
   @if (chargement()) {
     <p class="etat">Chargement…</p>
   } @else if (erreur(); as message) {
     <p class="erreur" role="alert">{{ message }}</p>
-  } @else if (matiere(); as m) {
+  } @else if (examen(); as e) {
     <div class="entete">
-      <h1>{{ m.libelle }}</h1>
-      @if (m.cloturee) {
-        <span class="badge">Clôturée</span>
+      <h1>{{ e.matiereLibelle }} · {{ e.session }} · {{ groupeNom() }}</h1>
+      @if (e.cloturee) {
+        <span class="badge">Clôturé</span>
       }
     </div>
-    <p class="aide">{{ m.code }} · Semestre {{ m.semestre }}</p>
+    <p class="aide">{{ e.matiereCode }} · {{ e.date | date: 'dd/MM/yyyy' }}</p>
 
-    @if (!m.cloturee) {
+    @if (!e.cloturee) {
       <div class="barre-actions">
-        <button type="button" (click)="ajouter()" [disabled]="etudiantsSansNote().length === 0">
+        <button type="button" (click)="ajouter()" [disabled]="etudiants().length === 0">
           Ajouter une note
         </button>
-        <button type="button" class="secondaire" (click)="demanderCloture()">Clôturer la matière</button>
-        @if (etudiantsSansNote().length === 0) {
+        <button type="button" class="secondaire" (click)="demanderCloture()">Clôturer l'examen</button>
+        @if (etudiants().length === 0) {
           <span class="aide">Tous vos étudiants ont déjà une note.</span>
         }
       </div>
     } @else {
-      <p class="aide">Matière clôturée : aucune saisie ni modification possible.</p>
+      <p class="aide">Examen clôturé : aucune saisie ni modification possible.</p>
     }
 
     @if (succes(); as message) {
@@ -38,8 +38,8 @@
     @if (clotureDemandee()) {
       <div class="confirmation" role="alertdialog" aria-label="Confirmer la clôture">
         <p>
-          <strong>Clôturer « {{ m.libelle }} » ?</strong> Cette action est définitive : plus aucune note ne pourra
-          être ajoutée ni modifiée.
+          <strong>Clôturer « {{ e.matiereLibelle }} ({{ e.session }}) » ?</strong> Cette action est définitive et
+          verrouille tous les groupes de cet examen : plus aucune note ne pourra être ajoutée ni modifiée.
         </p>
         <div class="actions">
           <button type="button" (click)="confirmerCloture()">Confirmer la clôture</button>
@@ -49,19 +49,26 @@
     }
 
     @if (formulaire(); as f) {
-      <app-note-formulaire
-        [matiereId]="m.id"
-        [etudiants]="etudiantsSansNote()"
-        [note]="f.note"
-        (enregistre)="onEnregistre($event)"
-        (annule)="fermerFormulaire()"
-      />
+      <div class="modal-fond" (click)="fermerFormulaire()">
+        <div class="modal" role="dialog" aria-modal="true" aria-label="Saisie de la note" (click)="$event.stopPropagation()">
+          <app-note-formulaire
+            [examenId]="e.id"
+            [groupeId]="groupeIdNum()"
+            [etudiants]="etudiants()"
+            [note]="f.note"
+            [etudiantChoisi]="f.etudiant"
+            (enregistre)="onEnregistre($event)"
+            (annule)="fermerFormulaire()"
+          />
+        </div>
+      </div>
     }
 
-    @if (notes().length === 0) {
-      <p class="etat">Aucune note saisie pour cette matière.</p>
+    @if (roster().length === 0) {
+      <p class="etat">Aucun étudiant dans ce groupe.</p>
     } @else {
       <p class="resume">
+        {{ roster().length }} étudiant{{ roster().length > 1 ? 's' : '' }} ·
         {{ notes().length }} note{{ notes().length > 1 ? 's' : '' }} saisie{{ notes().length > 1 ? 's' : '' }}
       </p>
 
@@ -75,36 +82,59 @@
               <th class="num">Note / 20</th>
               <th>Saisie le</th>
               <th>Modifiée le</th>
-              @if (!m.cloturee) {
+              @if (!e.cloturee) {
                 <th></th>
               }
             </tr>
           </thead>
           <tbody>
-            @for (note of notes(); track note.id) {
+            @for (ligne of roster(); track ligne.etudiantId) {
               <tr>
-                <td>{{ note.etudiantNumInscription }}</td>
-                <td>{{ note.etudiantNom }}</td>
-                <td>{{ note.etudiantPrenom }}</td>
-                <td class="num">{{ note.valeur | number: '1.2-2' }}</td>
-                <td>{{ note.dateSaisie | date: 'dd/MM/yyyy HH:mm' }}</td>
-                <td>
-                  @if (note.dateModification) {
-                    {{ note.dateModification | date: 'dd/MM/yyyy HH:mm' }}
+                <td>{{ ligne.numInscription }}</td>
+                <td>{{ ligne.nom }}</td>
+                <td>{{ ligne.prenom }}</td>
+                <td class="num">
+                  @if (ligne.note; as n) {
+                    {{ n.valeur | number: '1.2-2' }}
                   } @else {
                     —
                   }
                 </td>
-                @if (!m.cloturee) {
+                <td>
+                  @if (ligne.note; as n) {
+                    {{ n.dateSaisie | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    —
+                  }
+                </td>
+                <td>
+                  @if (ligne.note?.dateModification; as d) {
+                    {{ d | date: 'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    —
+                  }
+                </td>
+                @if (!e.cloturee) {
                   <td>
-                    <button
-                      type="button"
-                      class="secondaire petit"
-                      (click)="modifier(note)"
-                      [attr.aria-label]="'Modifier la note de ' + note.etudiantPrenom + ' ' + note.etudiantNom"
-                    >
-                      Modifier
-                    </button>
+                    @if (ligne.note; as n) {
+                      <button
+                        type="button"
+                        class="secondaire petit"
+                        (click)="modifier(n)"
+                        [attr.aria-label]="'Modifier la note de ' + ligne.prenom + ' ' + ligne.nom"
+                      >
+                        Modifier
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="secondaire petit"
+                        (click)="ajouterPour(ligne)"
+                        [attr.aria-label]="'Ajouter une note pour ' + ligne.prenom + ' ' + ligne.nom"
+                      >
+                        Ajouter
+                      </button>
+                    }
                   </td>
                 }
               </tr>

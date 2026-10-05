@@ -9,7 +9,9 @@ import java.time.LocalDateTime;
 public record NoteResponse(
         Long id,
         BigDecimal valeur,
+        Long examenId,
         Long matiereId,
+        String matiereLibelle,
         Long etudiantId,
         String etudiantNumInscription,
         String etudiantNom,
@@ -22,7 +24,9 @@ public record NoteResponse(
         return new NoteResponse(
                 n.getId(),
                 n.getValeur(),
-                n.getMatiere().getId(),
+                n.getExamen().getId(),
+                n.getExamen().getMatiere().getId(),
+                n.getExamen().getMatiere().getLibelle(),
                 n.getEtudiant().getId(),
                 n.getEtudiant().getNumInscription(),
                 n.getEtudiant().getNom(),

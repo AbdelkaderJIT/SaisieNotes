@@ -58,3 +58,31 @@
   margin: 0 0 1.5rem;
   color: var(--muted);
 }
+
+.theme-switch {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: inline-flex;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.theme-switch button {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 600;
+  border: none;
+  border-radius: 0;
+  padding: .45rem .9rem;
+}
+
+.theme-switch button + button { border-left: 1px solid var(--border); }
+
+.theme-switch button.actif {
+  background: var(--primary);
+  color: var(--primary-text);
+}

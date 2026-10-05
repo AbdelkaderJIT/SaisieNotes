@@ -29,6 +29,26 @@
 
 .resume { margin: 1.25rem 0 .75rem; }
 
+.modal-fond {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, .45);
+}
+
+.modal {
+  width: 100%;
+  max-width: 28rem;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal app-note-formulaire { display: block; }
+
 .tableau {
   overflow-x: auto;
   background: var(--surface);

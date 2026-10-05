@@ -42,9 +42,9 @@ describe('guards', () => {
     expect(executer(guestGuard)).toBe(true);
   });
 
-  it('guestGuard : renvoie un utilisateur déjà connecté vers /matieres', () => {
+  it('guestGuard : renvoie un utilisateur déjà connecté vers /examens', () => {
     seConnecter();
     const resultat = executer(guestGuard) as UrlTree;
-    expect(router.serializeUrl(resultat)).toBe('/matieres');
+    expect(router.serializeUrl(resultat)).toBe('/examens');
   });
 });

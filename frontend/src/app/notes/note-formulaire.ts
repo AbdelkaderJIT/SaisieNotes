@@ -16,9 +16,12 @@ import { NotesApi } from '../core/notes-api.service';
 export class NoteFormulaire {
   private readonly api = inject(NotesApi);
 
-  readonly matiereId = input.required<number>();
+  readonly examenId = input.required<number>();
+  readonly groupeId = input.required<number>();
   readonly etudiants = input<Etudiant[]>([]);
   readonly note = input<Note | null>(null);
+  // Étudiant choisi depuis sa ligne du tableau : pas de liste déroulante, il est fixé.
+  readonly etudiantChoisi = input<Etudiant | null>(null);
 
   readonly enregistre = output<Note>();
   readonly annule = output<void>();
@@ -42,14 +45,15 @@ export class NoteFormulaire {
     // Réinitialise le formulaire quand on passe d'une saisie à une modification (ou d'une note à une autre)
     effect(() => {
       const note = this.note();
-      untracked(() => this.initialiser(note));
+      const etudiant = this.etudiantChoisi();
+      untracked(() => this.initialiser(note, etudiant));
     });
   }
 
-  private initialiser(note: Note | null): void {
+  private initialiser(note: Note | null, etudiant: Etudiant | null): void {
     this.erreur.set(null);
-    this.form.reset({ etudiantId: note?.etudiantId ?? null, valeur: note?.valeur ?? null });
-    if (note) {
+    this.form.reset({ etudiantId: note?.etudiantId ?? etudiant?.id ?? null, valeur: note?.valeur ?? null });
+    if (note || etudiant) {
       this.form.controls.etudiantId.disable();   // l'étudiant d'une note existante ne change pas
     } else {
       this.form.controls.etudiantId.enable();
@@ -86,7 +90,7 @@ export class NoteFormulaire {
     const note = this.note();
     const requete = note
       ? this.api.modifier(note.id, valeur!)
-      : this.api.saisir(this.matiereId(), { etudiantId: etudiantId!, valeur: valeur! });
+      : this.api.saisir(this.examenId(), this.groupeId(), { etudiantId: etudiantId!, valeur: valeur! });
 
     this.enCours.set(true);
     requete.subscribe({

@@ -1,0 +1,28 @@
+<main class="page">
+  <a class="retour" routerLink="/examens">← Mes examens</a>
+
+  @if (chargement()) {
+    <p class="etat">Chargement…</p>
+  } @else if (erreur(); as message) {
+    <p class="erreur" role="alert">{{ message }}</p>
+  } @else if (examen(); as e) {
+    <div class="entete">
+      <h1>{{ e.matiereLibelle }} · {{ e.session }}</h1>
+      @if (e.cloturee) {
+        <span class="badge">Clôturé</span>
+      }
+    </div>
+    <p class="aide">{{ e.matiereCode }} · {{ e.date | date: 'dd/MM/yyyy' }}</p>
+    <p class="aide">Choisissez le groupe dont vous voulez saisir ou consulter les notes.</p>
+
+    <ul class="grille">
+      @for (groupe of e.groupes; track groupe.id) {
+        <li>
+          <a class="carte-groupe" [routerLink]="['/examens', e.id, 'groupes', groupe.id, 'notes']">
+            {{ groupe.nom }}
+          </a>
+        </li>
+      }
+    </ul>
+  }
+</main>

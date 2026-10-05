@@ -27,11 +27,10 @@ public class GlobalExceptionHandler {
     // Statut HTTP de chaque règle métier (les exceptions restent indépendantes du web)
     private static final Map<Class<? extends NoteException>, HttpStatus> STATUTS = Map.of(
             RessourceIntrouvableException.class, HttpStatus.NOT_FOUND,
-            AccesMatiereRefuseException.class, HttpStatus.FORBIDDEN,
-            EtudiantAutreEnseignantException.class, HttpStatus.FORBIDDEN,
-            MatiereClotureeException.class, HttpStatus.CONFLICT,
+            ExamenAccesRefuseException.class, HttpStatus.FORBIDDEN,
+            ExamenClotureException.class, HttpStatus.CONFLICT,
             NoteDejaExistanteException.class, HttpStatus.CONFLICT,
-            EtudiantNonInscritException.class, HttpStatus.UNPROCESSABLE_ENTITY,
+            EtudiantHorsGroupeException.class, HttpStatus.UNPROCESSABLE_ENTITY,
             ValeurInvalideException.class, HttpStatus.UNPROCESSABLE_ENTITY);
 
     @ExceptionHandler(NoteException.class)

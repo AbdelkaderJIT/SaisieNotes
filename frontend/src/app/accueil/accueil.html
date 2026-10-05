@@ -1,4 +1,9 @@
 <main class="accueil">
+  <div class="theme-switch" role="group" aria-label="Thème d'affichage">
+    <button type="button" [class.actif]="theme() === 'clair'" (click)="choisirTheme('clair')">Clair</button>
+    <button type="button" [class.actif]="theme() === 'sombre'" (click)="choisirTheme('sombre')">Sombre</button>
+  </div>
+
   <header class="officiel">
     <div class="armoiries">
       <img src="armoiries.png" width="90" height="105" alt="Armoiries de la République Tunisienne" />
@@ -14,6 +19,7 @@
   <section class="application" aria-labelledby="titre-application">
     <h1 id="titre-application">Saisie des notes</h1>
     <p>Espace réservé aux enseignants : saisissez, modifiez et consultez les notes de vos matières.</p>
+
     <a class="bouton" routerLink="/login">Se connecter</a>
   </section>
 </main>

@@ -51,12 +51,12 @@ describe('Login', () => {
     expect(naviguer).not.toHaveBeenCalled();
   });
 
-  it('va sur /matieres après un login réussi', async () => {
+  it('va sur /examens après un login réussi', async () => {
     await remplirEtEnvoyer('ali.benali@fds.tn', 'prof1');
 
     backend.expectOne('/api/me').flush({ id: 1, nom: 'Ben Ali', prenom: 'Ali', email: 'ali.benali@fds.tn' });
     await fixture.whenStable();
 
-    expect(naviguer).toHaveBeenCalledWith('/matieres', { replaceUrl: true });
+    expect(naviguer).toHaveBeenCalledWith('/examens', { replaceUrl: true });
   });
 });

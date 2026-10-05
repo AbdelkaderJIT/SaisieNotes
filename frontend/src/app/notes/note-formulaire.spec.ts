@@ -10,8 +10,8 @@ const ETUDIANTS: Etudiant[] = [
 ];
 
 const NOTE: Note = {
-  id: 7, valeur: 14.5, matiereId: 1, etudiantId: 2, etudiantNumInscription: '2024002',
-  etudiantNom: 'Mansour', etudiantPrenom: 'Nour', enseignantId: 1,
+  id: 7, valeur: 14.5, examenId: 1, matiereId: 1, matiereLibelle: 'Algorithmique', etudiantId: 2,
+  etudiantNumInscription: '2024002', etudiantNom: 'Mansour', etudiantPrenom: 'Nour', enseignantId: 1,
   dateSaisie: '2026-09-24T16:46:00', dateModification: null,
 };
 
@@ -28,7 +28,8 @@ describe('NoteFormulaire', () => {
 
     backend = TestBed.inject(HttpTestingController);
     fixture = TestBed.createComponent(NoteFormulaire);
-    fixture.componentRef.setInput('matiereId', 1);
+    fixture.componentRef.setInput('examenId', 1);
+    fixture.componentRef.setInput('groupeId', 5);
     fixture.componentRef.setInput('etudiants', ETUDIANTS);
     page = fixture.nativeElement as HTMLElement;
     await fixture.whenStable();
@@ -84,7 +85,7 @@ describe('NoteFormulaire', () => {
     await remplir('Jlassi', '11.5');
     await envoyer();
 
-    const requete = backend.expectOne((r) => r.method === 'POST' && r.url === '/api/matieres/1/notes');
+    const requete = backend.expectOne((r) => r.method === 'POST' && r.url === '/api/examens/1/groupes/5/notes');
     expect(requete.request.body).toEqual({ etudiantId: 3, valeur: 11.5 });
     requete.flush({ ...NOTE, id: 8, etudiantId: 3, valeur: 11.5 });
 
@@ -145,6 +146,21 @@ describe('NoteFormulaire', () => {
     requete.flush({ ...NOTE, valeur: 15.25, dateModification: '2026-09-25T10:00:00' });
 
     expect(enregistre).toHaveBeenCalledWith(expect.objectContaining({ valeur: 15.25 }));
+  });
+
+  it('saisie pour un étudiant choisi depuis sa ligne : pas de liste, son id est envoyé', async () => {
+    fixture.componentRef.setInput('etudiantChoisi', ETUDIANTS[0]);
+    await fixture.whenStable();
+
+    expect(page.querySelector('#etudiant')).toBeNull();
+    expect(page.querySelector('.etudiant-fixe')?.textContent).toContain('Nour Mansour');
+
+    await remplir(null, '13');
+    await envoyer();
+
+    const requete = backend.expectOne((r) => r.method === 'POST' && r.url === '/api/examens/1/groupes/5/notes');
+    expect(requete.request.body).toEqual({ etudiantId: 2, valeur: 13 });
+    requete.flush({ ...NOTE, valeur: 13 });
   });
 
   it('Annuler émet l\'événement sans appeler le serveur', async () => {

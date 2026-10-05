@@ -1,0 +1,84 @@
+<main class="page">
+  <h1>Mes examens</h1>
+  <p class="aide">Choisissez un examen pour accéder à ses groupes, puis saisir ou modifier les notes.</p>
+
+  @if (chargement()) {
+    <p class="etat">Chargement…</p>
+  } @else if (erreur(); as message) {
+    <p class="erreur" role="alert">{{ message }}</p>
+  } @else {
+    <div class="recherche">
+      <label for="recherche">Recherche</label>
+      <input
+        id="recherche"
+        type="search"
+        placeholder="Matière, session, groupe…"
+        (input)="rechercher($any($event.target).value)"
+      />
+    </div>
+
+    <div class="filtres">
+      <div>
+        <label for="filtre-matiere">Matière</label>
+        <select id="filtre-matiere" (change)="filtrerParMatiere($any($event.target).value)">
+          <option value="">Toutes les matières</option>
+          @for (matiere of matieres(); track matiere.id) {
+            <option [value]="matiere.id">{{ matiere.code }} — {{ matiere.libelle }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label for="filtre-groupe">Groupe</label>
+        <select id="filtre-groupe" (change)="filtrerParGroupe($any($event.target).value)">
+          <option value="">Tous les groupes</option>
+          @for (groupe of groupes(); track groupe.id) {
+            <option [value]="groupe.id">{{ groupe.nom }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    @if (examensFiltres().length === 0) {
+      <p class="etat">Aucun examen ne correspond à ces critères.</p>
+    } @else {
+      <div class="tableau">
+        <table>
+          <thead>
+            <tr>
+              <th>Matière</th>
+              <th>Session</th>
+              <th>Date</th>
+              <th>Groupes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (examen of examensFiltres(); track examen.id) {
+              <tr>
+                <td>
+                  <a class="lien-matiere" [routerLink]="['/examens', examen.id, 'groupes']">
+                    <span class="libelle">{{ examen.matiereLibelle }}</span>
+                  </a>
+                </td>
+                <td>{{ examen.session }}</td>
+                <td>{{ examen.date | date: 'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="groupes">
+                    @for (groupe of examen.groupes; track groupe.id) {
+                      <span class="chip">{{ groupe.nom }}</span>
+                    }
+                  </span>
+                </td>
+                <td>
+                  @if (examen.cloturee) {
+                    <span class="badge">Clôturé</span>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</main>

@@ -1,0 +1,58 @@
+.recherche {
+  max-width: 24rem;
+  margin: 1.25rem 0 0;
+}
+
+.filtres {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1.25rem;
+  max-width: 34rem;
+}
+
+.filtres > div { flex: 1; min-width: 12rem; }
+.filtres label { margin: 0 0 .25rem; }
+
+.tableau {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.lien-matiere {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.lien-matiere:hover,
+.lien-matiere:focus-visible { color: var(--primary); }
+
+.code {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--muted);
+}
+
+.libelle { font-weight: 600; }
+
+.groupes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.chip {
+  padding: .1rem .55rem;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: .75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}

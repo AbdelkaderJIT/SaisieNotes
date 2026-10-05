@@ -3,6 +3,8 @@
 
   @if (note(); as n) {
     <p class="etudiant-fixe">{{ n.etudiantPrenom }} {{ n.etudiantNom }} ({{ n.etudiantNumInscription }})</p>
+  } @else if (etudiantChoisi(); as e) {
+    <p class="etudiant-fixe">{{ e.prenom }} {{ e.nom }} ({{ e.numInscription }})</p>
   } @else {
     <label for="etudiant">Étudiant</label>
     <select id="etudiant" formControlName="etudiantId">

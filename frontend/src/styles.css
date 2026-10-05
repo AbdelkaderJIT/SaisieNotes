@@ -16,8 +16,9 @@
   color: var(--text);
 }
 
+/* Sombre : automatique selon le système, sauf choix explicite (data-theme, voir ThemeService) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='clair']) {
     --bg: #12161c;
     --surface: #1b212a;
     --text: #e6e9ee;
@@ -30,6 +31,20 @@
     --ok: #8fd4a4;
     --ok-bg: #1b3325;
   }
+}
+
+:root[data-theme='sombre'] {
+  --bg: #12161c;
+  --surface: #1b212a;
+  --text: #e6e9ee;
+  --muted: #9aa5b4;
+  --border: #2f3844;
+  --primary: #6ea2f0;
+  --primary-text: #0b1220;
+  --danger: #f2a29c;
+  --danger-bg: #3a1f1d;
+  --ok: #8fd4a4;
+  --ok-bg: #1b3325;
 }
 
 *, *::before, *::after { box-sizing: border-box; }

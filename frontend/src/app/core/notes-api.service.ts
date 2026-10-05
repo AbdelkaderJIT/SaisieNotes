@@ -1,7 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Etudiant, Matiere, Note } from './models';
+import { Etudiant, Examen, Groupe, Matiere, Note } from './models';
 
 export interface NouvelleNote {
   etudiantId: number;
@@ -13,31 +13,44 @@ export interface NouvelleNote {
 export class NotesApi {
   private readonly http = inject(HttpClient);
 
+  // Alimentent les filtres de la liste d'examens.
   matieres(): Observable<Matiere[]> {
     return this.http.get<Matiere[]>('/api/matieres');
   }
 
-  matiere(id: number): Observable<Matiere> {
-    return this.http.get<Matiere>(`/api/matieres/${id}`);
+  groupes(): Observable<Groupe[]> {
+    return this.http.get<Groupe[]>('/api/groupes');
   }
 
-  etudiants(matiereId: number): Observable<Etudiant[]> {
-    return this.http.get<Etudiant[]>(`/api/matieres/${matiereId}/etudiants`);
+  examens(matiereId?: number, groupeId?: number): Observable<Examen[]> {
+    let params = new HttpParams();
+    if (matiereId != null) params = params.set('matiereId', matiereId);
+    if (groupeId != null) params = params.set('groupeId', groupeId);
+    return this.http.get<Examen[]>('/api/examens', { params });
   }
 
-  notes(matiereId: number): Observable<Note[]> {
-    return this.http.get<Note[]>(`/api/matieres/${matiereId}/notes`);
+  examen(id: number): Observable<Examen> {
+    return this.http.get<Examen>(`/api/examens/${id}`);
   }
 
-  saisir(matiereId: number, note: NouvelleNote): Observable<Note> {
-    return this.http.post<Note>(`/api/matieres/${matiereId}/notes`, note);
+  // Étudiants du groupe qui n'ont pas encore de note pour cet examen (liste déroulante de saisie).
+  etudiantsSansNote(examenId: number, groupeId: number): Observable<Etudiant[]> {
+    return this.http.get<Etudiant[]>(`/api/examens/${examenId}/groupes/${groupeId}/etudiants`);
+  }
+
+  notesDe(examenId: number, groupeId: number): Observable<Note[]> {
+    return this.http.get<Note[]>(`/api/examens/${examenId}/groupes/${groupeId}/notes`);
+  }
+
+  saisir(examenId: number, groupeId: number, note: NouvelleNote): Observable<Note> {
+    return this.http.post<Note>(`/api/examens/${examenId}/groupes/${groupeId}/notes`, note);
   }
 
   modifier(noteId: number, valeur: number): Observable<Note> {
     return this.http.put<Note>(`/api/notes/${noteId}`, { valeur });
   }
 
-  cloturer(matiereId: number): Observable<Matiere> {
-    return this.http.post<Matiere>(`/api/matieres/${matiereId}/cloturer`, null);
+  cloturerExamen(examenId: number): Observable<Examen> {
+    return this.http.post<Examen>(`/api/examens/${examenId}/cloturer`, null);
   }
 }
