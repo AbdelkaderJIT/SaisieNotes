@@ -1,5 +1,6 @@
 package tn.espacenote.notedemo.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Tag(name = "Enseignant", description = "Consultation des examens affectés et saisie des notes")
 public class ExamenController {
 
     private final ExamenService examenService;

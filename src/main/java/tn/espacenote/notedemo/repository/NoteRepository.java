@@ -14,6 +14,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     boolean existsByEtudiantAndExamen(Etudiant etudiant, Examen examen);
 
+    // Garde-fou avant suppression d'un examen par l'administration : on ne supprime pas des notes à l'aveugle.
+    boolean existsByExamen(Examen examen);
+
     // Les notes d'un examen, pour un groupe donné. join fetch : charge l'étudiant avec la note
     // (évite une requête supplémentaire par ligne).
     @Query("""

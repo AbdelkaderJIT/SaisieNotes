@@ -27,6 +27,8 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(a -> a
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // préflight CORS d'Angular
+                    // Plus spécifique que /api/** ci-dessous : évalué en premier, donc prioritaire.
+                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
                     .requestMatchers("/api/**").authenticated()
                     // Fichiers de l'application Angular (pages, JS, CSS, images), lecture seule et publics :
                     // ils ne contiennent aucune donnée. Toutes les données passent par /api, protégé ci-dessus
@@ -44,16 +46,19 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // Deux comptes de démonstration. Le nom d'utilisateur est l'email de l'Enseignant en base,
-    // ce qui relie l'utilisateur connecté à ses examens (voir ExamenService.idEnseignantPar).
-    // L'Enseignant n'a pas de champ mot de passe : l'authentification reste hors du modèle métier.
-    // Les mots de passe viennent de la configuration (variables d'environnement en production).
+    // Deux comptes enseignant de démonstration, plus un compte admin pour /api/admin/**. Le nom
+    // d'utilisateur d'un enseignant est l'email de l'Enseignant en base, ce qui relie l'utilisateur
+    // connecté à ses examens (voir ExamenService.idEnseignantPar). L'Enseignant n'a pas de champ mot de
+    // passe : l'authentification reste hors du modèle métier. Les mots de passe viennent de la
+    // configuration (variables d'environnement en production).
     @Bean
     UserDetailsService userDetailsService(PasswordEncoder encoder,
                                           @Value("${app.demo.ali-password}") String motDePasseAli,
-                                          @Value("${app.demo.sonia-password}") String motDePasseSonia) {
+                                          @Value("${app.demo.sonia-password}") String motDePasseSonia,
+                                          @Value("${app.admin.password}") String motDePasseAdmin) {
         return new InMemoryUserDetailsManager(
                 User.withUsername("ali.benali@fds.tn").password(encoder.encode(motDePasseAli)).roles("ENSEIGNANT").build(),
-                User.withUsername("sonia.trabelsi@fds.tn").password(encoder.encode(motDePasseSonia)).roles("ENSEIGNANT").build());
+                User.withUsername("sonia.trabelsi@fds.tn").password(encoder.encode(motDePasseSonia)).roles("ENSEIGNANT").build(),
+                User.withUsername("admin").password(encoder.encode(motDePasseAdmin)).roles("ADMIN").build());
     }
 }

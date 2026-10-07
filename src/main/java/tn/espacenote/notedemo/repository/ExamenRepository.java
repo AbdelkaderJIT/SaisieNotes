@@ -14,4 +14,8 @@ public interface ExamenRepository extends JpaRepository<Examen, Long> {
     @Query("select distinct e from Examen e left join fetch e.groupes where e.enseignant = :enseignant "
             + "order by e.date desc, e.id")
     List<Examen> findByEnseignant(@Param("enseignant") Enseignant enseignant);
+
+    // Pour l'administration : tous les examens, tous enseignants confondus.
+    @Query("select distinct e from Examen e left join fetch e.groupes order by e.date desc, e.id")
+    List<Examen> findAllAvecGroupes();
 }

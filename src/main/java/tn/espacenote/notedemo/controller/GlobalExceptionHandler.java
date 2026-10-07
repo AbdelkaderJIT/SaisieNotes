@@ -29,6 +29,7 @@ public class GlobalExceptionHandler {
             RessourceIntrouvableException.class, HttpStatus.NOT_FOUND,
             ExamenAccesRefuseException.class, HttpStatus.FORBIDDEN,
             ExamenClotureException.class, HttpStatus.CONFLICT,
+            ExamenPossedeDesNotesException.class, HttpStatus.CONFLICT,
             NoteDejaExistanteException.class, HttpStatus.CONFLICT,
             EtudiantHorsGroupeException.class, HttpStatus.UNPROCESSABLE_ENTITY,
             ValeurInvalideException.class, HttpStatus.UNPROCESSABLE_ENTITY);

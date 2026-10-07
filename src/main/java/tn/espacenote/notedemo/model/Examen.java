@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -19,10 +20,11 @@ import java.util.Set;
 
 // Un examen : une matière, donnée par un enseignant, à une date, pour une session (DS1, DS2, Examen final).
 // Il peut couvrir plusieurs groupes à la fois (le même examen donné à toutes les classes de l'enseignant).
-// Il n'est jamais créé à la main : il arrive via ExamenIngestionRunner, qui le reçoit du webservice
-// d'examens (ExamenSourceController aujourd'hui, un vrai système externe plus tard).
+// Créé et modifié par l'administration via l'API /api/admin (ExamenAdminController) ; l'enseignant ne fait
+// que le consulter et y saisir des notes, jamais le créer.
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 public class Examen {
 
